@@ -5,7 +5,6 @@ goog.require('ScoreLibrary');
 goog.require('ScoreLibrary.MusicXMLLoader');
 goog.require('ScoreLibrary.Score.Source');
 goog.require('ScoreLibrary.Score.ElementIterFactory');
-goog.require('ScoreLibrary.ScoreDiv');
 
 noteLookup = {
 	C: 0,
