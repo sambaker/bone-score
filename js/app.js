@@ -43,7 +43,7 @@ function scoreLoaded(xml) {
     if (part) {
     	App.score = new BoneScore(App.boneNotes, part);
     	App.renderer = new BoneRenderer({
-    		vertical: true,
+    		vertical: false,
 			slideGridDim: 80,
 			slideGridSpacing: 1,
 			timeGridDim: 50,
