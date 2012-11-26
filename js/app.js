@@ -12,6 +12,11 @@ App = {
 	renderer: null
 }
 
+function getParam(key) {
+    key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
+    var match = location.search.match(new RegExp("[?&]"+key+"=([^&]+)(&|$)"));
+    return match && decodeURIComponent(match[1].replace(/\+/g, " "));
+}
 
 function scoreLoaded(xml) {
 	//console.log("loaded",arguments);
@@ -57,7 +62,7 @@ function scoreLoadError() {
 $(document).ready(function() {
 	//var file = "scores/backatown.xml";
 	//var file = "scores/wenceslas.xml";
-	var file = "scores/josn.xml";
+	var file = getParam("score") || "scores/josn.xml";
 
     ScoreLibrary.MusicXMLLoader.create(
         file,
