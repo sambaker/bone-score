@@ -1,7 +1,8 @@
 
-function BoneScore(boneNotes, score) {
+function BoneScore(boneNotes, score, transpose) {
 	var self = this;
 
+	transpose = transpose || 0;
 	self.allNotes = [];
 	self.measures = [];
 
@@ -24,7 +25,8 @@ function BoneScore(boneNotes, score) {
 			while (child_iterator.hasNext()) {
 				var note = child_iterator.next();
 				if (ScoreLibrary.Score.Note.prototype.isPrototypeOf(note)) {
-					var positions = boneNotes.slidePositions(note.step, note.octave, note.alter);
+					var index = boneNotes.noteIndex(note.step, note.octave, note.alter);
+					var positions = boneNotes.slidePositionsByIndex(index + transpose);
 					if (positions && positions.length) {
 						console.log(note.type + " note at partial " + (positions[0].partial+1) + ", position " + (positions[0].position+1));
 						var note = {

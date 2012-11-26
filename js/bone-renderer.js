@@ -31,7 +31,7 @@ function BoneRenderer(config) {
 
 	self.clear = function() {
 		_.each(self.canvases, function(canvas) {
-			$(canvas).remove();
+			$(canvas.canvas).remove();
 		});
 		self.canvases = [];
 	}
@@ -166,6 +166,8 @@ function BoneRenderer(config) {
 			context.fill();
 			t += self.config.timeGridDim;
 		});
+
+		return o;
 	}
 
 	self.setConfig(config);
