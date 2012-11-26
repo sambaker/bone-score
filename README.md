@@ -12,7 +12,16 @@ MusicXML can be exported from many music score editors like MuseScore, Finale, F
 Project Status
 --------------
 
-Very early stages, more features and refactoring coming
+Very early stages, more features and refactoring coming. Planned:
+
+- color coding partials
+- showing notes that are out of user's range
+- transpose up/down (or transpose within trombone range for tunes that aren't within range) buttons
+- support horizontal or vertical rendering
+- render seperate canvases per measure OR rendering measure dividers OR breaking by measure at max-time-dimension
+- show notes and timing as part of notation
+- optimize score to trombone translation algorithm for minimal slide/partial changes
+- allow user to select alternate positioning for notes that have multiple options
 
 Installation with dependencies
 ------------------------------
