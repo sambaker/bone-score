@@ -59,17 +59,7 @@ function Color(color) {
 		return "rgb("+self.r+","+self.g+","+self.b+")";
 	}
 
-	if (color[0] == "#") {
-		self.hex = color;
-		self.r = (hexToInt[color[1]] << 4) + hexToInt[color[2]];
-		self.g = (hexToInt[color[3]] << 4) + hexToInt[color[4]];
-		self.b = (hexToInt[color[5]] << 4) + hexToInt[color[6]];
-		self.a = 1;
-	} else if (arguments.length > 1) {
-		self.r = _.isUndefined(arguments[0]) ? 0 : arguments[0];
-		self.g = _.isUndefined(arguments[1]) ? 0 : arguments[1];
-		self.b = _.isUndefined(arguments[2]) ? 0 : arguments[2];
-		self.a = _.isUndefined(arguments[3]) ? 1 : arguments[3];
+	self._updateHex = function() {
 		var r = self.r.toString(16);
 		var g = self.g.toString(16);
 		var b = self.b.toString(16);
@@ -83,6 +73,28 @@ function Color(color) {
 			b = "0" + b;
 		}
 		self.hex = "#" + r + g + b;
+	}
+
+	self.scale = function(s) {
+		self.r = Math.max(0, Math.min(Math.round(self.r * s), 255));
+		self.g = Math.max(0, Math.min(Math.round(self.g * s), 255));
+		self.b = Math.max(0, Math.min(Math.round(self.b * s), 255));
+		self.a = Math.max(0, Math.min(self.a * s, 1));
+		self._updateHex();
+	}
+
+	if (color[0] == "#") {
+		self.hex = color;
+		self.r = (hexToInt[color[1]] << 4) + hexToInt[color[2]];
+		self.g = (hexToInt[color[3]] << 4) + hexToInt[color[4]];
+		self.b = (hexToInt[color[5]] << 4) + hexToInt[color[6]];
+		self.a = 1;
+	} else if (arguments.length > 1) {
+		self.r = _.isUndefined(arguments[0]) ? 0 : arguments[0];
+		self.g = _.isUndefined(arguments[1]) ? 0 : arguments[1];
+		self.b = _.isUndefined(arguments[2]) ? 0 : arguments[2];
+		self.a = _.isUndefined(arguments[3]) ? 1 : arguments[3];
+		self._updateHex();
 	} else {
 		if (color.indexOf('rgb(') == 0) {
 			color = color.substring(4,color.length-1);
@@ -101,5 +113,30 @@ function Color(color) {
 		} else {
 			self.a = 1;
 		}
+	}
+}
+
+function LocalStorage(defaults) {
+	var self = this;
+
+	self.defaults = defaults || {};
+
+	self.init = function() {
+	}
+
+	self.read = function(key, defaultValue) {
+		var value = $.cookie(key)
+		if (value === null) {
+			value = defaultValue || defaults[key];
+		}
+		return value;
+	}
+
+	self.write = function(key, value) {
+		$.cookie(key, value);
+	}
+
+	self.remove = function(key) {
+		$.removeCookie(key);
 	}
 }

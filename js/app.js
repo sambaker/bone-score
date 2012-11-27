@@ -8,6 +8,7 @@ goog.require('ScoreLibrary.Score.ElementIterFactory');
 
 App = {
 	boneNotes: new BoneNotes(),
+	storage: new LocalStorage(),
 	score: null,
 	renderer: null
 }
@@ -17,7 +18,20 @@ App.context = {
 	source: ko.observable(null),
 	vertical: ko.observable(false),
 	transpose: ko.observable(0),
+	highColor: ko.observable(App.storage.read("highColor", "#d6fb61")),
+	lowColor: ko.observable(App.storage.read("lowColor", "#86b5d8"))
 }
+
+function colorChanged() {
+	App.storage.write("lowColor", App.context.lowColor())
+	App.storage.write("highColor", App.context.highColor());
+	BoneRenderer.setColors(App.context.lowColor(), App.context.highColor());
+	if (App.renderer) {
+		App.renderer.render();
+	}
+}
+
+colorChanged();
 
 function contextChanged() {
 	if (App.context.source()) {
@@ -59,12 +73,15 @@ function scoreNameChanged() {
         null,
         scoreLoaded,
         scoreLoadError);
+    App.storage.write('scoreUrl', App.context.scoreName());
 }
 
 App.context.transpose.subscribe(contextChanged);
 App.context.vertical.subscribe(contextChanged);
 App.context.source.subscribe(contextChanged);
 App.context.scoreName.subscribe(scoreNameChanged);
+App.context.highColor.subscribe(colorChanged);
+App.context.lowColor.subscribe(colorChanged);
 
 function getParam(key) {
     key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
@@ -99,5 +116,5 @@ $(document).ready(function() {
 	contextDiv.attr('data-bind', "template: { name: 'contextTemplate', data: $data }").appendTo($('#context'));
 	ko.applyBindings(App.context, contextDiv[0]);
 
-	App.context.scoreName(getParam("score") || "scores/backatown.xml");
+	App.context.scoreName(getParam("score") || App.storage.read("scoreUrl", "scores/backatown.xml"));
 });

@@ -14,15 +14,17 @@ Project Status
 
 Very early stages, more features and refactoring coming. Planned:
 
-- color coding partials [DONE]
 - showing notes that are out of user's range
 - select part from files with multiple parts
-- transpose up/down (or transpose within trombone range for tunes that aren't within range) buttons [DONE]
-- support horizontal or vertical rendering [DONE]
 - render seperate canvases per measure OR rendering measure dividers OR breaking by measure at max-time-dimension
 - show notes and timing as part of notation
 - optimize score to trombone translation algorithm for minimal slide/partial changes
 - allow user to select alternate positioning for notes that have multiple options
+
+- color coding partials [DONE]
+- adjust color input [DONE]
+- transpose up/down (or transpose within trombone range for tunes that aren't within range) buttons [DONE]
+- support horizontal or vertical rendering [DONE]
 
 Installation with dependencies
 ------------------------------

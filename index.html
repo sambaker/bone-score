@@ -5,6 +5,7 @@
 
 		<script type="text/javascript" src="../closure-library/closure/goog/base.js"></script>
 		<script type="text/javascript" src="external/jquery-1.8.1.js"></script>
+		<script type="text/javascript" src="external/jquery.cookie.js"></script>
 		<script type="text/javascript" src="external/underscore.js"></script>
 		<script type="text/javascript" src="external/knockout-2.2.0.debug.js"></script>
 
@@ -22,6 +23,8 @@
 			<p>MusicXML URL: <input class="blockFloatRight text-input" data-bind="value: scoreName" /></p>
 			<p>Transpose: <input class="blockFloatRight text-input" data-bind="value: transpose, valueUpdate: 'afterkeydown'" /></p>
 			<p>Vertical time: <input class="blockFloatRight check-input" type="checkbox" data-bind="checked: vertical" /></p>
+			<p>High color: <input type="color" class="blockFloatRight color-input" data-bind="value: highColor" /></p>
+			<p>Low color: <input type="color" class="blockFloatRight color-input" data-bind="value: lowColor" /></p>
 		</script>
 
 		<div id="context"></div>

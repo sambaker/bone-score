@@ -1,32 +1,4 @@
 
-var oddStart = new Color('#86b5d8');
-var oddEnd = new Color('#d6fb61');
-var evenStart = new Color('#76a5c8');
-var evenEnd = new Color('#d6e73c');
-
-var start = oddStart;
-var end = oddEnd;
-
-partialColors = {
-	// Out of range of the trombone
-	"INVALID": { odd: "#fa8f83", even: "#fa8f83" },
-	// Out of the student's range
-	"OUTOFRANGE": { odd: "#ff56f0", even: "#ff56f0" }
-};
-
-for (var i = 0; i <= 8; ++i) {
-	var oddR = oddStart.r + (oddEnd.r - oddStart.r) * i / 8;
-	var evenR = evenStart.r + (evenEnd.r - evenStart.r) * i / 8;
-	var oddG = oddStart.g + (oddEnd.g - oddStart.g) * i / 8;
-	var evenG = evenStart.g + (evenEnd.g - evenStart.g) * i / 8;
-	var oddB = oddStart.b + (oddEnd.b - oddStart.b) * i / 8;
-	var evenB = evenStart.b + (evenEnd.b - evenStart.b) * i / 8;
-	partialColors[''+(i-1)] = {
-		odd: new Color(Math.round(oddR), Math.round(oddG), Math.round(oddB)).toHex(),
-		even: new Color(Math.round(evenR), Math.round(evenG), Math.round(evenB)).toHex()
-	}
-}
-
 function BoneRenderer(config) {
 	var self = this;
 	var axes;
@@ -151,17 +123,17 @@ function BoneRenderer(config) {
 		_.each(notes, function(note, i) {
 			if (note.positions) {
 				var pos = note.positions[note.selectedPosition];
-				context.fillStyle = partialColors[pos.partial].odd;
+				context.fillStyle = self.partialColors[pos.partial].odd;
 			} else {
-				context.fillStyle = partialColors["INVALID"].odd;
+				context.fillStyle = self.partialColors["INVALID"].odd;
 			}
 			for (i = 1; i < 7; i += 2) {
 				fillRect(context, self.config.slideGridDim * i + self.config.slideGridSpacing, t + self.config.timeGridSpacing, self.config.slideGridDim - self.config.timeGridSpacing, self.config.timeGridDim - self.config.timeGridSpacing);
 			}
 			if (note.positions) {
-				context.fillStyle = partialColors[pos.partial].even;
+				context.fillStyle = self.partialColors[pos.partial].even;
 			} else {
-				context.fillStyle = partialColors["INVALID"].even;
+				context.fillStyle = self.partialColors["INVALID"].even;
 			}
 			for (i = 0; i < 7; i += 2) {
 				fillRect(context, self.config.slideGridDim * i + 1, t + 1, self.config.slideGridDim - 1, self.config.timeGridDim - 1);
@@ -240,26 +212,44 @@ function BoneRenderer(config) {
 	self.setConfig(config);
 }
 
+BoneRenderer.setColors = function(low, high) {
+	var l = new Color(low);
+	var h = new Color(high);
+	var lo = new Color(low);
+	var ho = new Color(high);
+	lo.scale(0.94);
+	ho.scale(0.94);
+
+	BoneRenderer.prototype.partialColors = {
+		// Out of range of the trombone
+		"INVALID": { odd: "#fa8f83", even: "#fa8f83" },
+		// Out of the student's range
+		"OUTOFRANGE": { odd: "#ff56f0", even: "#ff56f0" }
+	};
+
+	for (var i = 0; i <= 8; ++i) {
+		var oddR = lo.r + (ho.r - lo.r) * i / 8;
+		var evenR = l.r + (h.r - l.r) * i / 8;
+		var oddG = lo.g + (ho.g - lo.g) * i / 8;
+		var evenG = l.g + (h.g - l.g) * i / 8;
+		var oddB = lo.b + (ho.b - lo.b) * i / 8;
+		var evenB = l.b + (h.b - l.b) * i / 8;
+		BoneRenderer.prototype.partialColors[''+(i-1)] = {
+			odd: new Color(Math.round(oddR), Math.round(oddG), Math.round(oddB)).toHex(),
+			even: new Color(Math.round(evenR), Math.round(evenG), Math.round(evenB)).toHex()
+		}
+	}
+}
+
+
+BoneRenderer.setColors('#86b5d8', '#d6fb61');
+
 BoneRenderer.AxesHorizontal = {
-	axisTime: "left",
-	AxisTime: "Left",
 	dimTime: "width",
-	DimTime: "Width",
-	axisSlide: "top",
-	AxisSlide: "Top",
 	dimSlide: "height",
-	DimSlide: "Height",
-	scaleSlide: -1
 }
 
 BoneRenderer.AxesVertical = {
-	axisTime: "top",
-	AxisTime: "Top",
 	dimTime: "height",
-	DimTime: "Height",
-	axisSlide: "left",
-	AxisSlide: "Left",
 	dimSlide: "width",
-	DimSlide: "Width",
-	scaleSlide: 1
 }
