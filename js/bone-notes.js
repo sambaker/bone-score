@@ -14,7 +14,8 @@ function BoneNotes() {
 		self.notesByIndex[index].push({
 			partial: partial,
 			position: position,
-			score: score
+			name: note,
+			alter: alter
 		});
 	}
 

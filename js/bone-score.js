@@ -27,19 +27,15 @@ function BoneScore(boneNotes, score, transpose) {
 				if (ScoreLibrary.Score.Note.prototype.isPrototypeOf(note)) {
 					var index = boneNotes.noteIndex(note.step, note.octave, note.alter);
 					var positions = boneNotes.slidePositionsByIndex(index + transpose);
-					if (positions && positions.length) {
-						console.log(note.type + " note at partial " + (positions[0].partial+1) + ", position " + (positions[0].position+1));
-						var note = {
-							positions: positions,
-							note: note,
-							selectedPosition: 0,
-							measureIndex: measureIndex
-						};
-						measure.push(note);
-						self.allNotes.push(note);
-					} else {
-						self.error = "This music can not be played on trombone in this key!";
-					}
+					//console.log(note.type + " note at partial " + (positions[0].partial+1) + ", position " + (positions[0].position+1));
+					var note = {
+						positions: positions,
+						note: note,
+						selectedPosition: 0,
+						measureIndex: measureIndex++
+					};
+					measure.push(note);
+					self.allNotes.push(note);
 				}
 			}
 		}

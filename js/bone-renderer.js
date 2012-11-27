@@ -7,7 +7,12 @@ var evenEnd = new Color('#d6e73c');
 var start = oddStart;
 var end = oddEnd;
 
-partialColors = {};
+partialColors = {
+	// Out of range of the trombone
+	"INVALID": { odd: "#fa8f83", even: "#fa8f83" },
+	// Out of the student's range
+	"OUTOFRANGE": { odd: "#ff56f0", even: "#ff56f0" }
+};
 
 for (var i = 0; i <= 8; ++i) {
 	var oddR = oddStart.r + (oddEnd.r - oddStart.r) * i / 8;
@@ -85,9 +90,9 @@ function BoneRenderer(config) {
 
 	function moveTo(context, slidePos, timePos) {
 		if (self.config.vertical) {
-			context.lineTo(slidePos, timePos);
+			context.moveTo(slidePos, timePos);
 		} else {
-			context.lineTo(timePos, slidePos);
+			context.moveTo(timePos, slidePos);
 		}
 	}
 
@@ -104,6 +109,13 @@ function BoneRenderer(config) {
 			return self.config.slideGridDimHalf + self.config.slideGridDim * position;
 		} else {
 			return self.config.slideGridDimHalf + self.config.slideGridDim * (6 - position);
+		}
+	}
+	function strokeText(context, text, slidePos, timePos) {
+		if (self.config.vertical) {
+			context.strokeText(text, slidePos, timePos);
+		} else {
+			context.strokeText(text, timePos, slidePos);
 		}
 	}
 
@@ -125,45 +137,100 @@ function BoneRenderer(config) {
 		var i;
 		var t;
 		var p;
+		var lastNoteGood;
+		context.strokeStyle = "#000000";
+		context.lineWidth = 4;
 		context.globalAlpha = 1.0;
+		context.font = "14px sans-serif";
+		context.textAlign = "center";
+		context.textBaseline = "middle";
 		context.clearRect(0, 0, canvas.width, canvas.height);
+
+		// Draw the grid
 		t = 0;
 		_.each(notes, function(note, i) {
-			var pos = note.positions[note.selectedPosition];
-			context.fillStyle = partialColors[pos.partial].odd;
+			if (note.positions) {
+				var pos = note.positions[note.selectedPosition];
+				context.fillStyle = partialColors[pos.partial].odd;
+			} else {
+				context.fillStyle = partialColors["INVALID"].odd;
+			}
 			for (i = 1; i < 7; i += 2) {
 				fillRect(context, self.config.slideGridDim * i + self.config.slideGridSpacing, t + self.config.timeGridSpacing, self.config.slideGridDim - self.config.timeGridSpacing, self.config.timeGridDim - self.config.timeGridSpacing);
 			}
-			context.fillStyle = partialColors[pos.partial].even;
+			if (note.positions) {
+				context.fillStyle = partialColors[pos.partial].even;
+			} else {
+				context.fillStyle = partialColors["INVALID"].even;
+			}
 			for (i = 0; i < 7; i += 2) {
 				fillRect(context, self.config.slideGridDim * i + 1, t + 1, self.config.slideGridDim - 1, self.config.timeGridDim - 1);
 			}
+			if (note.measureIndex == 0) {
+				context.beginPath();
+				moveTo(context, 0, t);
+				lineTo(context, self.config.sizeSlide, t);
+				context.stroke();
+			}
 			t += self.config.timeGridDim;
+			if (i == (note.length - 1)) {
+				context.beginPath();
+				moveTo(context, 0, t);
+				lineTo(context, self.config.sizeSlide, t);
+				context.stroke();
+			}
 		});
+
+		// Draw the lines to show slide movement
 		t = self.config.timeGridDimHalf;
-		context.lineWidth = 2;
 		context.globalAlpha = 0.7;
+		context.lineWidth = 2;
 		context.beginPath();
+		lastNoteGood = false;
 		_.each(notes, function(note, i) {
-			var pos = note.positions[note.selectedPosition];
-			p = getSlidePositionCoord(pos.position);
-			if (i) {
-				lineTo(context, p, t);
+			if (note.positions) {
+				var pos = note.positions[note.selectedPosition];
+				p = getSlidePositionCoord(pos.position);
+				if (i) {
+					if (lastNoteGood) {
+						lineTo(context, p, t);
+					} else {
+						moveTo(context, p, t);
+					}
+				} else {
+					moveTo(context, p, t);
+				}
+				lastNoteGood = true;
 			} else {
-				moveTo(context, p, t);
+				lastNoteGood = false;
 			}
 			t += self.config.timeGridDim;
 		});
 		context.stroke();
+
+		// Draw the note markers
 		t = self.config.timeGridDimHalf;
-		context.fillStyle = "#000000";
-		context.globalAlpha = 1.0;
+		context.globalAlpha = 1;
+		context.fillStyle = "#ffffff";
 		_.each(notes, function(note, i) {
-			var pos = note.positions[note.selectedPosition];
-			p = getSlidePositionCoord(pos.position);
-			context.beginPath();
-			arc(context, p, t, 4, 0, Math.PI * 2);
-			context.fill();
+			if (note.positions) {
+				var pos = note.positions[note.selectedPosition];
+				p = getSlidePositionCoord(pos.position);
+				context.beginPath();
+				arc(context, p, t, 14, 0, Math.PI * 2);
+				context.fill();
+				context.stroke();
+				var text = pos.name;
+				var offset = 0;
+				if (pos.alter > 0) {
+					offset = 1;
+					text += String.fromCharCode(9839);
+				} else if (pos.alter < 0) {
+					offset = 2;
+					text += String.fromCharCode(9837);
+				}
+				strokeText(context, text, p, t+offset);
+			}
 			t += self.config.timeGridDim;
 		});
 
