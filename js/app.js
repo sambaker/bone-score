@@ -33,6 +33,12 @@ function colorChanged() {
 
 colorChanged();
 
+function render() {
+	if (App.renderer) {
+		App.renderer.render();
+	}
+}
+
 function contextChanged() {
 	if (App.context.source()) {
 	    parts = App.context.source().getParts();
@@ -54,7 +60,7 @@ function contextChanged() {
 
 	    	App.score = new BoneScore(App.boneNotes, part, parseInt(App.context.transpose()));
 	    	App.renderer = new BoneRenderer({
-	    		vertical: App.context.vertical(),
+	    		vertical: App.context.vertical,
 				slideGridDim: 80,
 				slideGridSpacing: 1,
 				timeGridDim: 50,
@@ -77,7 +83,7 @@ function scoreNameChanged() {
 }
 
 App.context.transpose.subscribe(contextChanged);
-App.context.vertical.subscribe(contextChanged);
+App.context.vertical.subscribe(render);
 App.context.source.subscribe(contextChanged);
 App.context.scoreName.subscribe(scoreNameChanged);
 App.context.highColor.subscribe(colorChanged);

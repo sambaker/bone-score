@@ -19,7 +19,7 @@ function BoneRenderer(config) {
 		self.config.timeGridDimHalf = config.timeGridDim >> 1;
 		self.config.sizeSlide = config.slideGridDim * 7;
 		score = config.score;
-		if (config.vertical) {
+		if (config.vertical()) {
 			axes = BoneRenderer.AxesVertical;
 		} else {
 			axes = BoneRenderer.AxesHorizontal;
@@ -45,7 +45,7 @@ function BoneRenderer(config) {
 	}
 
 	function fillRect(context, slidePos, timePos, slideDim, timeDim) {
-		if (self.config.vertical) {
+		if (self.config.vertical()) {
 			context.fillRect(slidePos, timePos, slideDim, timeDim);
 		} else {
 			context.fillRect(timePos, slidePos, timeDim, slideDim);
@@ -53,7 +53,7 @@ function BoneRenderer(config) {
 	}
 
 	function lineTo(context, slidePos, timePos) {
-		if (self.config.vertical) {
+		if (self.config.vertical()) {
 			context.lineTo(slidePos, timePos);
 		} else {
 			context.lineTo(timePos, slidePos);
@@ -61,7 +61,7 @@ function BoneRenderer(config) {
 	}
 
 	function moveTo(context, slidePos, timePos) {
-		if (self.config.vertical) {
+		if (self.config.vertical()) {
 			context.moveTo(slidePos, timePos);
 		} else {
 			context.moveTo(timePos, slidePos);
@@ -69,7 +69,7 @@ function BoneRenderer(config) {
 	}
 
 	function arc(context, slidePos, timePos, radius, start, end) {
-		if (self.config.vertical) {
+		if (self.config.vertical()) {
 			context.arc(slidePos, timePos, radius, start, end);
 		} else {
 			context.arc(timePos, slidePos, radius, start, end);
@@ -77,18 +77,30 @@ function BoneRenderer(config) {
 	}
 
 	function getSlidePositionCoord(position) {
-		if (self.config.vertical) {
+		if (self.config.vertical()) {
 			return self.config.slideGridDimHalf + self.config.slideGridDim * position;
 		} else {
 			return self.config.slideGridDimHalf + self.config.slideGridDim * (6 - position);
 		}
 	}
 	function strokeText(context, text, slidePos, timePos) {
-		if (self.config.vertical) {
+		if (self.config.vertical()) {
 			context.strokeText(text, slidePos, timePos);
 		} else {
 			context.strokeText(text, timePos, slidePos);
 		}
+	}
+
+	function slidePosTimeToCanvasXY(slidePos, timePos) {
+		if (self.config.vertical()) {
+			return { x: slidePos, y: timePos };
+		}
+		return { x: timePos, y: slidePos };
+	}
+
+	function changeSelectedPosition(note, i) {
+		note.selectedPosition = i;
+		self.render();
 	}
 
 	self.renderNotes = function(notes) {
@@ -103,7 +115,8 @@ function BoneRenderer(config) {
 		var o = {
 			canvas: canvas,
 			context: context,
-			notes: notes
+			notes: notes,
+			colliders: []
 		}
 
 		var i;
@@ -204,6 +217,41 @@ function BoneRenderer(config) {
 				strokeText(context, text, p, t+offset);
 			}
 			t += self.config.timeGridDim;
+		});
+
+		// Draw the alternate position markers
+		t = self.config.timeGridDimHalf;
+		context.globalAlpha = 0.3;
+		context.fillStyle = "#ffffff";
+		var radius = 14;
+		_.each(notes, function(note, i) {
+			_.each(note.positions, function(pos, i) {
+				if (i == note.selectedPosition) {
+					return;
+				}
+				p = getSlidePositionCoord(pos.position);
+				context.beginPath();
+				arc(context, p, t, radius, 0, Math.PI * 2);
+				context.fill();
+				context.stroke();
+				o.colliders.push({
+					pos: slidePosTimeToCanvasXY(p, t),
+					radiusSquared: radius * radius * 1.5 * 1.5,
+					action: _.bind(changeSelectedPosition, self, note, i)
+				});
+			});
+			t += self.config.timeGridDim;
+		});
+
+		$(o.canvas).on('click', function(e) {
+			var x = e.pageX - this.offsetLeft;
+			var y = e.pageY - this.offsetTop;
+			_.each(o.colliders, function(c, i) {
+				var sqDist = (c.pos.x - x) * (c.pos.x - x) + (c.pos.y - y) * (c.pos.y - y);
+				if (sqDist < c.radiusSquared) {
+					c.action();
+				}
+			});
 		});
 
 		return o;

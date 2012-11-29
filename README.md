@@ -15,12 +15,15 @@ Project Status
 Very early stages, more features and refactoring coming. Planned:
 
 - showing notes that are out of user's range
+- show rests
 - select part from files with multiple parts
-- render seperate canvases per measure OR rendering measure dividers OR breaking by measure at max-time-dimension
 - show notes and timing as part of notation
 - optimize score to trombone translation algorithm for minimal slide/partial changes
-- allow user to select alternate positioning for notes that have multiple options
 
+DONE:
+
+- allow user to select alternate positioning for notes that have multiple options [DONE]
+- render seperate canvases per measure OR rendering measure dividers OR breaking by measure at max-time-dimension [DONE]
 - color coding partials [DONE]
 - adjust color input [DONE]
 - transpose up/down (or transpose within trombone range for tunes that aren't within range) buttons [DONE]
